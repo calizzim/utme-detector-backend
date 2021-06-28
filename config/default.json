@@ -1,3 +1,6 @@
 {
-    "databaseURL": "mongodb://localhost/playground"
+    "databaseURL": "mongodb://localhost/playground",
+    "privateKey":"temp",
+    "taxeeHeader":"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJBUElfS0VZX01BTkFHRVIiLCJodHRwOi8vdGF4ZWUuaW8vdXNlcl9pZCI6IjYwZDgwNmViNjIyYzVjNzJkY2FhYTEzYSIsImh0dHA6Ly90YXhlZS5pby9zY29wZXMiOlsiYXBpIl0sImlhdCI6MTYyNDc3MDI4M30.L9wh7iLTURHHWU4pRJAH_K5ZRXkCzjP8-13MgSUANok",
+    "taxeeURL":"http://taxee.io/api/v2/"
 }

@@ -1,33 +1,24 @@
 module.exports = {
     title: 'Login',
     showTitle: true,
-    resetOnSubmit: true,
+    resetOnSubmit: false,
     groups: [
         {
-            title: 'loginInfo',
+            title: 'userInfo',
             showTitle: false,
             components: [
                 {
                     dType: String,
                     type: 'text',
-                    name: 'username',
-                    validators: 'name',
-                    asyncValidators: ['unique'],
-                    hint: 'your unique identifier',
+                    name: 'email',
+                    validators: 'email',
                 },
                 {
                     dType: String,
-                    type: 'radio',
-                    name: 'salaryType',
-                    validators: 'radio',
-                    options: ['monthly','yearly']
-                },
-                {
-                    dType: String,
-                    type: 'dropdown',
-                    name: 'state',
-                    validators: 'dropdown',
-                    options: 'states'
+                    type: 'text',
+                    name: 'password',
+                    validators: 'password',
+                    hidden: true
                 },
             ]
         }

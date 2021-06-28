@@ -21,6 +21,14 @@ const types = {
         validators.required,
         validators.minLength(8)
     ],
+    currency: [
+        validators.required,
+        validators.currency
+    ],
+    integer: [
+        validators.required,
+        validators.integer
+    ],
     dropdown: [
         validators.required
     ],

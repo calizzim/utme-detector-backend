@@ -11,6 +11,14 @@ module.exports = {
         expression: /^[a-zA-z]*$/,
         message: 'can only contain letters'
     },
+    currency: {
+        expression: /^\d+(\.\d{2})?$/,
+        message: 'must be a euro amount'
+    },
+    integer: {
+        expression: /^\d*$/,
+        message: 'must be a whole number'
+    },
     minLength: (len) => {
         return {
             expression:  RegExp(`.{${len},}`),

@@ -1,6 +1,6 @@
 const express = require('express');
 const route = express.Router()
-const FormHandler = require('./functions/FormHandler')
+const FormHandler = require('./helperClasses/FormHandler')
 const formHandler = new FormHandler()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -43,8 +43,9 @@ route.post('/:formName', authenticator, async (req,res) => {
     if(!formHandler.checkName(formName)) return res.status(404).send({ error: `${formName} is not an available form` })
     const error = await formHandler.verify(req.body,formName)
     if(error) return res.status(400).send({ error: error })
-    let result = await formHandler.database.upload(formName, req.body, token)
-    res.status(200).send({data: result})
+    //formHandler.database.upload(formName, req.body, req.token)
+    let computed = await formHandler.computeData(formName,req.body)
+    res.status(200).send({data: computed})
 });
 
 //asynchronous verification

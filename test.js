@@ -1,1 +1,7 @@
-console.log([{name:'hello'},{name:'hello'}].findIndex((e) => e.name == 'hello'))
+const obj = {
+    p1: 1,
+    p2: 2,
+    p3: 3
+}
+
+Object.

@@ -1,26 +1,36 @@
 const fs = require('fs')
 const path = require('path')
-const typesToValidators = require('./typeToValidators')
-const options = require('./options')
+const typesToValidators = require('../helperFunctions/typeToValidators')
+const options = require('../helperFunctions/options')
 const _ = require('lodash')
+const axios = require('axios').default
 const Database = require('./Database')
 
 module.exports = class {
-    clientTemplates = {}
-    serverTemplates = {}
-    database
-
+    
     constructor() {
         this.templateNames = fs
         .readdirSync(path.join(__dirname,'../templates'))
         .map(ele => ele.split('.')[0])
         
+        this.clientTemplates = {}
+        this.serverTemplates = {}
+        this.computedTemplates = {}
+        
         for(let templateName of this.templateNames) {
             let template = require(path.join('../templates',templateName))
+            if(template.template) {
+                this.computedTemplates[templateName] = template.computed
+                template = template.template
+            }
             this.clientTemplates[templateName] = this.convertTemplate(template,true)
             this.serverTemplates[templateName] = this.removeGroups(this.convertTemplate(template,false))
         }
 
+        this.http = axios.create({
+            baseURL: "/api/"
+        })
+        
         this.database = new Database(this)
     }
 
@@ -28,14 +38,23 @@ module.exports = class {
         return this.templateNames.includes(templateName)
     }
 
-    getTemplateClient(formName) {
-        if(!this.checkName(formName)) return null
-        return this.clientTemplates[formName]
+    getTemplateClient(templateName) {
+        if(!this.checkName(templateName)) return null
+        return this.clientTemplates[templateName]
     }
 
-    getTemplateServer(formName) {
-        if(!this.checkName(formName)) return null
-        return this.serverTemplates[formName]
+    getTemplateServer(templateName) {
+        if(!this.checkName(templateName)) return null
+        return this.serverTemplates[templateName]
+    }
+
+    async computeData(templateName, data) {
+        let computedTemplate = this.computedTemplates[templateName]
+        if(!computedTemplate) return null
+        return computedTemplate.reduce((properties,current) => {
+            properties[current.name] = current.compute(data,properties)
+            return properties
+        },{}) 
     }
 
     async verify(data, templateName) {

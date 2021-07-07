@@ -29,6 +29,10 @@ const types = {
         validators.required,
         validators.integer
     ],
+    number: [
+        validators.required,
+        validators.number
+    ],
     dropdown: [
         validators.required
     ],

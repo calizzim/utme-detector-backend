@@ -1,6 +1,7 @@
 const config = require('config');
 const db = require('mongoose');
 const bcrypt = require('bcrypt');
+
 module.exports = class {
     constructor(formHandler) {
         this.templates = formHandler.serverTemplates
@@ -15,7 +16,7 @@ module.exports = class {
                 temp[key] = template[key].dType
                 schema.add(temp)
             }
-            if(templateName != 'user') schema.add({ _id: Number })
+            if(templateName != 'user') schema.add({ _id: db.Types.ObjectId })
             this.models[templateName] = db.model(templateName, schema)
         }
 
@@ -26,11 +27,19 @@ module.exports = class {
         .catch(error=>console.log(error));
     }
 
-    async upload(templateName, data, token=null) {
-        if(token) data._id = token._id
+    async upload(templateName, data, token) {
         const Model = this.models[templateName]
-        const toUpload = new Model(data)
-        const result = await toUpload.save()
+        let result = await Model.findByIdAndUpdate(token.id, data)
+        if(result) return
+        const newEntry = new Model(data, Object.assign(data, { _id: token.id }))
+        result = await newEntry.save()
+        return result
+    }
+
+    async newUser(data) {
+        const User = this.models.user
+        const newUser = new User(data)
+        const result = await newUser.save()
         return result
     }
 
@@ -40,6 +49,13 @@ module.exports = class {
         if(!user) return null
         if(await bcrypt.compare(data.password,user.password)) return user._id
         return null
+    }
+
+    async getFormData(templateName, token) {
+        const Model = this.models[templateName]
+        if(!Model || !token.id) return null
+        let formData = await Model.findById(token.id)
+        return formData
     }
 
     async verify(templateName, name, value) {

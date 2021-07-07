@@ -1,7 +1,3 @@
-const obj = {
-    p1: 1,
-    p2: 2,
-    p3: 3
-}
-
-Object.
+let Home = require('./routes/api/Home')
+let home = new Home()
+console.log(home.getHomeValue(2000))

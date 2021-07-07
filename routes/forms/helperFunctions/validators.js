@@ -13,11 +13,15 @@ module.exports = {
     },
     currency: {
         expression: /^\d+(\.\d{2})?$/,
-        message: 'must be a euro amount'
+        message: 'must be a dollar amount'
     },
     integer: {
         expression: /^\d*$/,
         message: 'must be a whole number'
+    },
+    number: {
+        expression: /^\d+(\.\d+)?/,
+        message: 'must be a number',
     },
     minLength: (len) => {
         return {

@@ -24,6 +24,13 @@ module.exports = {
                         validators: 'radio',
                         options: ['monthly','yearly']
                     },
+                    {
+                        dType: Number,
+                        type: 'text',
+                        name: 'salaryGrowthPercentage',
+                        validators: 'integer',
+                        hint: 'how much do you expect your salary to grow every year?'
+                    },
                 ]
             },
             {
@@ -51,25 +58,32 @@ module.exports = {
                 showTitle: true,
                 components: [
                     {
-                        dType: String,
+                        dType: Number,
                         type: 'text',
                         name: 'savingPercentage',
                         validators: 'integer',
                         hint: 'what percentage of your income do you want to save?'
                     },
                     {
-                        dType: String,
+                        dType: Number,
                         type: 'text',
                         name: 'currentAge',
                         validators: 'integer',
                         hint: 'how old are you now?'
                     },
                     {
-                        dType: String,
+                        dType: Number,
                         type: 'text',
                         name: 'retirementAge',
                         validators: 'integer',
                         hint: 'whats your ideal retirement age?'
+                    },
+                    {
+                        dType: Number,
+                        type: 'text',
+                        name: 'investmentReturns',
+                        validators: 'integer',
+                        hint: 'yearly returns on investments'
                     },
                 ]
             }
@@ -107,5 +121,32 @@ module.exports = {
                 return savings
             }
         },
+        {
+            name: 'savingsChartData',
+            compute: (native, computed) => {
+                let xvalues = Array(native.retirementAge-native.currentAge+1)
+                .fill(native.currentAge).map((current,index) => current+index)
+                let yvalues = xvalues.reduce((yvalues,current,index) => {
+                    if(index == 0) { yvalues.push(0); return yvalues }
+                    yvalues.push((yvalues[index-1]+(computed.savings.total*Math.pow(1+native.salaryGrowthPercentage/100,index)))*(1+native.investmentReturns/100))
+                    return yvalues
+                },[])
+                return { xvalues: xvalues, yvalues: yvalues }
+            }
+        },
+        {
+            name: 'pieChartData',
+            compute: (native,computed) => {
+                let pretaxSalary = computed.pretaxSalary
+                let xvalues = ['401k contributions','additional savings','taxes','whats left for other expenses?']
+                let contributionPercent = computed.savings.contribution/pretaxSalary*100
+                let additionalPercent = computed.savings.additional/pretaxSalary*100
+                let taxesPercent = computed.taxes.total/pretaxSalary*100
+                let otherPercent = 100-contributionPercent-additionalPercent-taxesPercent
+                let yvalues = [contributionPercent,additionalPercent,taxesPercent,otherPercent]
+                return { xvalues: xvalues, yvalues: yvalues }
+            }
+        }
+
     ]
 }

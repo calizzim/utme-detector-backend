@@ -62,6 +62,7 @@ module.exports = class {
         for(let key in template) if(!(key in data)) return 'data is missing some keys in the template'
         if(Object.keys(template).length != Object.keys(data).length) return 'data has additional keys not in the template'
         for(let key in template) {
+            data[key] = template[key].dType(data[key])
             for(let validator of template[key].validators) 
             { if(!validator.expression.test(data[key])) return `field ${key} ${validator.message}` }
             if(template[key].type == 'dropdown' && !(template[key].options.includes(data[key]))) 

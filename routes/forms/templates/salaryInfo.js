@@ -137,13 +137,9 @@ module.exports = {
         {
             name: 'pieChartData',
             compute: (native,computed) => {
-                let pretaxSalary = computed.pretaxSalary
                 let xvalues = ['401k contributions','additional savings','taxes','whats left for other expenses?']
-                let contributionPercent = computed.savings.contribution/pretaxSalary*100
-                let additionalPercent = computed.savings.additional/pretaxSalary*100
-                let taxesPercent = computed.taxes.total/pretaxSalary*100
-                let otherPercent = 100-contributionPercent-additionalPercent-taxesPercent
-                let yvalues = [contributionPercent,additionalPercent,taxesPercent,otherPercent]
+                let leftOver = computed.pretaxSalary - computed.savings.contribution - computed.savings.additional - computed.taxes.total
+                let yvalues = [computed.savings.contribution,computed.savings.additional,computed.taxes.total,leftOver]
                 return { xvalues: xvalues, yvalues: yvalues }
             }
         }

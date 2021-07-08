@@ -45,20 +45,16 @@ module.exports = {
         {
             name: 'homeEquityData',
             compute: (native, computed) => {
-                let xvalues = Array(native.mortgageLength*12)
-                               .fill(0)
-                               .map((value,index) => index)
+                let xvalues = Array(native.mortgageLength*12).fill(0).map((value,index) => index)
                 let yvalues = xvalues.reduce((yvalues, xvalue, index) => {
                     let last = index == 0 ? 0 : yvalues[index-1]
                     yvalues.push(
-                        last + 
-                        (native.monthlyPayment - ((computed.homeValue - last) * native.interestRate / 1200))
-                    )
+                        last + (native.monthlyPayment - ((computed.homeValue - last) * native.interestRate / 1200)))
                     return yvalues
                 },[])
                 return { 
-                    xvalues: xvalues.filter((val,index) => index % 12 == 0).map(val => val/12), 
-                    yvalues: yvalues.filter((val,index) => index % 12 == 0) 
+                    xvalues: xvalues.filter((val,index) => !index || (index+1) % 12 == 0).map((val,index) => index!=0?(val+1)/12:0), 
+                    yvalues: yvalues.filter((val,index) => !index || (index+1) % 12 == 0) 
                 }
             }
         },

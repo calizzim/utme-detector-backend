@@ -29,9 +29,10 @@ module.exports = {
                         type: 'text',
                         name: 'salaryGrowthPercentage',
                         validators: 'integer',
-                        hint: 'how much do you expect your salary to grow every year?'
+                        hint: 'how much do you expect your salary to grow every year?',
+                        advanced: true
                     },
-                ]
+                ],
             },
             {
                 title: 'taxInfo',
@@ -83,7 +84,8 @@ module.exports = {
                         type: 'text',
                         name: 'investmentReturns',
                         validators: 'integer',
-                        hint: 'yearly returns on investments'
+                        hint: 'yearly returns on investments',
+                        advanced: true
                     },
                 ]
             }

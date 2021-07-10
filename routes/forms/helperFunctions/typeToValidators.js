@@ -33,6 +33,11 @@ const types = {
         validators.required,
         validators.number
     ],
+    zipcode: [
+        validators.required,
+        validators.minLength(5),
+        validators.maxLength(5)
+    ],
     dropdown: [
         validators.required
     ],

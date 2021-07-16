@@ -38,6 +38,9 @@ const types = {
         validators.minLength(5),
         validators.maxLength(5)
     ],
+    required: [
+        validators.required
+    ],
     dropdown: [
         validators.required
     ],

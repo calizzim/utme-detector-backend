@@ -1,80 +1,105 @@
 const config = require('config');
 const db = require('mongoose');
 const bcrypt = require('bcrypt');
-
+const PropertyTaxes = require('../../../api/PropertyTaxes')
 module.exports = class {
-    constructor(formHandler) {
-        this.templates = formHandler.serverTemplates
-        
-        //create schema from templates
-        this.models = {}
-        for(let templateName in this.templates) {
-            let template = this.templates[templateName]
-            let schema = new db.Schema({})
-            for(let key in template){
-                let temp = {}
-                temp[key] = template[key].dType
-                schema.add(temp)
-            }
-            if(templateName != 'user') schema.add({ _id: db.Types.ObjectId })
-            this.models[templateName] = db.model(templateName, schema)
-        }
+  constructor(formHandler) {
+    this.propertyTaxes = new PropertyTaxes()
+    this.templates = formHandler.serverTemplates
 
-        //connect to the database
-        const databaseURL = config.get('databaseURL')
-        db.connect(databaseURL, {useUnifiedTopology:true, useNewUrlParser: true})
-        .then(()=>console.log('connected to database successfully'))
-        .catch(error=>console.log(error));
+    //create schema from templates
+    this.models = {}
+    for (let templateName in this.templates) {
+      let template = this.templates[templateName]
+      let schema = new db.Schema({})
+      for (let key in template) {
+        let temp = {}
+        temp[key] = template[key].dType
+        schema.add(temp)
+      }
+      if (templateName != 'user') schema.add({ _id: db.Types.ObjectId })
+      this.models[templateName] = db.model(templateName, schema)
     }
 
-    async upload(templateName, data, token) {
-        const Model = this.models[templateName]
-        let result = await Model.findByIdAndUpdate(token.id, data)
-        if(result) return
-        const newEntry = new Model(data, Object.assign(data, { _id: token.id }))
-        result = await newEntry.save()
-        return result
-    }
+    //connect to the database
+    const databaseURL = config.get('databaseURL')
+    db.connect(databaseURL, { useUnifiedTopology: true, useNewUrlParser: true })
+      .then(() => console.log('connected to database successfully'))
+      .catch(error => console.log(error));
+  }
 
-    async newUser(data) {
-        const User = this.models.user
-        const newUser = new User(data)
-        const result = await newUser.save()
-        return result
-    }
+  async upload(templateName, data, token) {
+    const Model = this.models[templateName]
+    let result = await Model.findByIdAndUpdate(token.id, data, { useFindAndModify: false })
+    if (result) return
+    const newEntry = new Model(data, Object.assign(data, { _id: token.id }))
+    result = await newEntry.save()
+    return result
+  }
 
-    async authenticateLogin(data) {
-        const Model = this.models.user
-        let user = await Model.findOne({ email: data.email })
-        if(!user) return null
-        if(await bcrypt.compare(data.password,user.password)) return user._id
-        return null
-    }
+  async newUser(data) {
+    const User = this.models.user
+    const newUser = new User(data)
+    const result = await newUser.save()
+    return result
+  }
 
-    async getFormData(templateName, token) {
-        const Model = this.models[templateName]
-        if(!Model || !token.id) return null
-        let formData = await Model.findById(token.id)
-        return formData
-    }
+  async authenticateLogin(data) {
+    const Model = this.models.user
+    let user = await Model.findOne({ email: data.email })
+    if (!user) return null
+    if (await bcrypt.compare(data.password, user.password)) return user._id
+    return null
+  }
 
-    async verify(templateName, name, value) {
-        const validators = this.templates[templateName][name].asyncValidators
-        if(!validators) return null
-        for(let validator of validators) {
-            let result = await this.asyncValidatorFunctions[validator](templateName,name,value)
-            if(result) return result
-        }
-        return null
-    }
+  async getCompleted(token) {
+    let modelKeys = Object.keys(this.models)
+    let data = await Promise.all(modelKeys.map(k => {
+      let Model = this.models[k]
+      return Model.findById(token.id)
+    }))
+    let completed = data.reduce((a,c,i) => {
+      a[modelKeys[i]] = Boolean(c)
+      return a
+    },{})
+    return completed
+  }
 
-    asyncValidatorFunctions = {
-        unique: async (formName, name, value) => {
-            let query = {}; query[name] = value
-            let result = await this.models[formName].findOne(query)
-            if(result) return { unique: 'has already been taken' }
-            return null
-        }
+  async getFormData(templateName, token) {
+    const Model = this.models[templateName]
+    if (!Model || !token.id) return null
+    let formData = await Model.findById(token.id)
+    return formData
+  }
+
+  async verify(templateName, name, value, token) {
+    const validators = this.templates[templateName][name].asyncValidators
+    if (!validators || !value) return null
+    for (let validator of validators) {
+      let result = await this.asyncValidatorFunctions[validator](templateName, name, value, token)
+      if (result) return result
     }
+    return null
+  }
+
+  asyncValidatorFunctions = {
+    unique: async (formName, name, value, token) => {
+      let query = {}; query[name] = value
+      let result = await this.models[formName].findOne(query)
+      if (result) return { unique: 'has already been taken' }
+      return null
+    },
+    zipcodeOrCounty: async (formName, name, value, token) => {
+      let state = (await this.models.salaryInfo.findById(token.id)).state
+      let taxes = this.propertyTaxes.getTaxrateZipcode(value)
+      if(taxes) return null
+      taxes = this.propertyTaxes.getTaxrateCounty(state,value)
+      if(taxes) return null
+      let message
+      if(/\d/.test(value.slice(0,1))) message = 'this zipcode is invalid'
+      else message = state + ' does not have a county with this name'
+      return { zipcodeOrCounty: message }
+    }
+  }
 
 }

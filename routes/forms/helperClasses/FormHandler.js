@@ -19,12 +19,13 @@ module.exports = class {
         
         for(let templateName of this.templateNames) {
             let template = require(path.join('../templates',templateName))
-            if(template.template) {
-                this.computedTemplates[templateName] = template.computed
-                template = template.template
+            if(template.computed) {
+                this.computedTemplates[templateName] = { properties: template.computed, order: template.order }
             }
-            this.clientTemplates[templateName] = this.convertTemplate(template,true)
-            this.serverTemplates[templateName] = this.removeGroups(this.convertTemplate(template,false))
+            if(template.template) {
+              this.clientTemplates[templateName] = this.convertTemplate(template.template,true)
+              this.serverTemplates[templateName] = this.removeGroups(this.convertTemplate(template.template,false))
+            }
         }
 
         this.http = axios.create({
@@ -39,25 +40,44 @@ module.exports = class {
     }
 
     getTemplateClient(templateName) {
-        if(!this.checkName(templateName)) return null
+        if(!this.clientTemplates[templateName]) return null
         return this.clientTemplates[templateName]
     }
 
     getTemplateServer(templateName) {
-        if(!this.checkName(templateName)) return null
+        if(!this.serverTemplates[templateName]) return null
         return this.serverTemplates[templateName]
     }
 
-    async computeData(templateName, data) {
-        let computedTemplate = this.computedTemplates[templateName]
-        if(!computedTemplate) return null
+    computeData(templateName, data, previous) {
+        let computedTemplate = this.computedTemplates[templateName].properties
         return computedTemplate.reduce((properties,current) => {
-            properties[current.name] = current.compute(data,properties)
+            properties[current.name] = current.compute(data,properties,previous)
             return properties
         },{}) 
     }
 
-    async verify(data, templateName) {
+    async getComputed(templateName, data, token) {
+      let template = this.computedTemplates[templateName]
+      if(!template) return null
+      let order = template.order
+      let names = [...Array(order).keys()].map(o => {
+        let name = Object.keys(this.computedTemplates).find(k => this.computedTemplates[k].order == o)
+        return name
+      })
+      let native = await Promise.all(names.map(name => {
+        return this.database.getFormData(name,token)
+      }))
+      let previous = names.reduce((p,c,i) => {
+        let computed = this.computeData(c, native[i], p)
+        p[c] = { native: native[i], computed: computed }
+        return p
+      },{})
+      return this.computeData(templateName, data, previous)
+    }
+
+
+    async verify(data, templateName, token = null) {
         const template = this.serverTemplates[templateName]
         for(let key in template) if(!(key in data)) return 'data is missing some keys in the template'
         if(Object.keys(template).length != Object.keys(data).length) return 'data has additional keys not in the template'
@@ -67,7 +87,7 @@ module.exports = class {
             { if(!validator.expression.test(data[key])) return `field ${key} ${validator.message}` }
             if(template[key].type == 'dropdown' && !(template[key].options.includes(data[key]))) 
             { return `field ${key} must be one of the following options ${template[key].options}` }
-            let result = await this.database.verify(templateName,key,data[key])
+            let result = await this.database.verify(templateName,key,data[key],token)
             if(result) {
                 result = result[Object.keys(result)[0]]
                 return `${key} ${result}`

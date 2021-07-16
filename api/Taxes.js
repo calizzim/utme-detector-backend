@@ -40,16 +40,17 @@ module.exports = class {
         return this.states.find(e => e.name == state).abbreviation
     }
 
-    getTaxes(native, computed) {
-        let savingsAmount = computed.pretaxSalary * native.savingPercentage / 100
-        let grossSalary = computed.pretaxSalary - Math.min(savingsAmount, 19500)
-        let state = this.getAbbrev(native.state)
-        let federalTaxes = this.taxes.federal[native.filingStatus]
-        let stateTaxes = this.taxes.state[state][native.filingStatus]
-        return {
+    getTaxes(retirementContribution, pretaxSalary, state, filingStatus) {
+        let stateAbbrev = this.getAbbrev(state)
+        let federalTaxes = this.taxes.federal[filingStatus]
+        let stateTaxes = this.taxes.state[stateAbbrev][filingStatus]
+        let grossSalary = pretaxSalary - retirementContribution
+        let taxes = {
+            fica: pretaxSalary * 0.0765,
             federal: this.calcTaxes(grossSalary, federalTaxes),
-            fica: computed.pretaxSalary * 0.0765,
             state: this.calcTaxes(grossSalary, stateTaxes)
         }
+        taxes.total = Object.keys(taxes).reduce((a,c) => a + taxes[c],0)
+        return taxes
     }
 }

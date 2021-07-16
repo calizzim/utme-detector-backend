@@ -5,34 +5,34 @@ module.exports = {
     },
     required: {
         expression: /\S+/,
-        message: 'is required'
+        message: 'this is required'
     },
     onlyLetters: {
         expression: /^[a-zA-z]*$/,
-        message: 'can only contain letters'
+        message: 'this can only contain letters'
     },
     currency: {
         expression: /^\d+(\.\d{2})?$/,
-        message: 'must be a dollar amount'
+        message: 'this must be a dollar amount'
     },
     integer: {
         expression: /^\d*$/,
-        message: 'must be a whole number'
+        message: 'this must be a whole number'
     },
     number: {
         expression: /^\d+(\.\d+)?/,
-        message: 'must be a number',
+        message: 'this must be a number',
     },
     minLength: (len) => {
         return {
             expression:  RegExp(`.{${len},}`),
-            message: `must be at least ${len} characters long`
+            message: `this must be at least ${len} characters long`
         }
     },
     maxLength: (len) => {
         return {
             expression:  RegExp(`^.{0,${len}}$`),
-            message: `must be ${len} characters or fewer`
+            message: `this must be ${len} characters or fewer`
         }
     }
 

@@ -1,4 +1,5 @@
 module.exports = {
+  template: {
     title: 'Signup',
     showTitle: true,
     resetOnSubmit: false,
@@ -24,4 +25,5 @@ module.exports = {
             ]
         }
     ]
+  }
 }

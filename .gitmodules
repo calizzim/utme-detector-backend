@@ -1,0 +1,3 @@
+[submodule "app/reusable"]
+	path = app/reusable
+	url = https://github.com/calizzim/reusable-backend.git

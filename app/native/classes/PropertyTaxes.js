@@ -8,7 +8,7 @@ module.exports = class {
     this.countyToTaxrate = JSON.parse(
       fs.readFileSync("app/native/files/countyToTaxrate.json")
     );
-    this.states = JSON.parse(fs.readFileSync("app/reusable/files/states.json"));
+    this.states = JSON.parse(fs.readFileSync("app/reusable-backend/files/states.json"));
   }
   getAbbrev(state) {
     return this.states.find((o) => o.name == state).abbreviation;

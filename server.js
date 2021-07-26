@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const api = require('./index');
+const api = require('./app/native/routes/api');
 app.use('/api', api);
 
 const frontend = require('./frontend/serve')

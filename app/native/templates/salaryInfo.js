@@ -1,6 +1,6 @@
-const Taxes = require("../../../api/Taxes");
+const Taxes = require("../classes/Taxes");
 const taxHelper = new Taxes();
-const ChartFunctions = require("../../../api/ChartFunctions");
+const ChartFunctions = require("../classes/ChartFunctions");
 
 module.exports = {
   template: {

@@ -3,8 +3,8 @@ const express = require('express');
 const app = express.Router();
 
 //routes
-const forms = require('./routes/forms/forms')
-const auth = require('./routes/auth/auth')
+const forms = require('../../reusable/routes/forms')
+const auth = require('../../reusable/routes/auth')
 
 //middleware
 app.use(express.json())

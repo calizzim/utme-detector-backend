@@ -1,13 +1,14 @@
 const fs = require("fs");
+
 module.exports = class {
   constructor() {
     this.zipcodeToTaxrate = JSON.parse(
-      fs.readFileSync("files/zipcodeToTaxrate.json")
+      fs.readFileSync("app/native/files/zipcodeToTaxrate.json")
     );
     this.countyToTaxrate = JSON.parse(
-      fs.readFileSync("files/countyToTaxrate.json")
+      fs.readFileSync("app/native/files/countyToTaxrate.json")
     );
-    this.states = JSON.parse(fs.readFileSync("files/states.json"));
+    this.states = JSON.parse(fs.readFileSync("app/reusable/files/states.json"));
   }
   getAbbrev(state) {
     return this.states.find((o) => o.name == state).abbreviation;

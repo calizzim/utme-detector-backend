@@ -1,12 +1,11 @@
 const express = require("express");
 const route = express.Router();
-const FormHandler = require("./helperClasses/FormHandler");
+const FormHandler = require("../classes/FormHandler");
 const formHandler = new FormHandler();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("config");
-const authenticator = require("../../middleware/authenticator");
-const decode = require("../../middleware/decode");
+const authenticator = require("../middleware/authenticator");
 
 //get a list of forms that the user has completed
 route.get("/completed", authenticator, async(req,res) => {

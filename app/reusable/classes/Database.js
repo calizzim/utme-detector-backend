@@ -1,10 +1,14 @@
 const config = require('config');
 const db = require('mongoose');
 const bcrypt = require('bcrypt');
-const PropertyTaxes = require('../../../api/PropertyTaxes')
+
+const nativeAsyncValidators = require('../../native/functions/asyncValidators')
+const reusableAsyncValidators = require('../functions/asyncValidators')
+
 module.exports = class {
   constructor(formHandler) {
-    this.propertyTaxes = new PropertyTaxes()
+    this.asyncValidatorFunctions = { ...nativeAsyncValidators, ...reusableAsyncValidators }
+
     this.templates = formHandler.serverTemplates
 
     //create schema from templates
@@ -81,25 +85,4 @@ module.exports = class {
     }
     return null
   }
-
-  asyncValidatorFunctions = {
-    unique: async (formName, name, value, token) => {
-      let query = {}; query[name] = value
-      let result = await this.models[formName].findOne(query)
-      if (result) return { unique: 'has already been taken' }
-      return null
-    },
-    zipcodeOrCounty: async (formName, name, value, token) => {
-      let state = (await this.models.salaryInfo.findById(token.id)).state
-      let taxes = this.propertyTaxes.getTaxrateZipcode(value)
-      if(taxes) return null
-      taxes = this.propertyTaxes.getTaxrateCounty(state,value)
-      if(taxes) return null
-      let message
-      if(/\d/.test(value.slice(0,1))) message = 'this zipcode is invalid'
-      else message = state + ' does not have a county with this name'
-      return { zipcodeOrCounty: message }
-    }
-  }
-
 }

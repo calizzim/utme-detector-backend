@@ -1,4 +1,3 @@
-const ChartFunctions = require('../../../api/ChartFunctions')
 const _ = require('lodash')
 
 module.exports = {

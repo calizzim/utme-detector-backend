@@ -1,6 +1,6 @@
-const PropertyTaxes = require('../../../api/PropertyTaxes')
+const PropertyTaxes = require('../classes/PropertyTaxes')
 const propertyTaxes = new PropertyTaxes()
-const ChartFunctions = require('../../../api/ChartFunctions')
+const ChartFunctions = require('../classes/ChartFunctions')
 
 module.exports = {
   template: {

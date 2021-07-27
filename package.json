@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "debug":"nodemon --inspect index.js",
-    "run":"nodemon index.js",
-    "start":"node index.js"
+    "debug": "nodemon --inspect index.js",
+    "run": "nodemon index.js",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",

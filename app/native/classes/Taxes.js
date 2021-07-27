@@ -12,17 +12,17 @@ module.exports = class {
             baseURL: "http://taxee.io/api/v2/",
             headers: { Authorization: this.header }
         })
-        this.taxes = JSON.parse(fs.readFileSync('files/taxes.json')),
-        this.states = JSON.parse(fs.readFileSync('files/states.json'))
+        this.taxes = JSON.parse(fs.readFileSync(path.join(__dirname,'../files/taxes.json'))),
+        this.states = JSON.parse(fs.readFileSync(path.join(__dirname,'../../reusable/files/states.json')))
     }
 
     async update() {
-        const abbs = JSON.parse(fs.readFileSync('files/states.json')).map(state => state.abbreviation)
+        const abbs = JSON.parse(fs.readFileSync(path.join(__dirname,'../../reusable/files/states.json'))).map(state => state.abbreviation)
         const requests = await Promise.all(abbs.map(state => this.taxee.get('/state/2020/'+state)))
         const stateTaxes = abbs.reduce((a,c,i) => { a[c]=requests[i].data; return a },{})
         const federalTaxes = (await this.taxee.get('/federal/2020')).data
         const taxes = { state: stateTaxes, federal: federalTaxes }
-        fs.writeFileSync('files/taxes.json',JSON.stringify(taxes,null,4))
+        fs.writeFileSync(path.join(__dirname,'../files/taxes.json'),JSON.stringify(taxes,null,4))
         this.taxes = taxes
     }
     

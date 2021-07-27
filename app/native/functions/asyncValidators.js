@@ -2,11 +2,11 @@ const PropertyTaxes = require('../classes/PropertyTaxes')
 const propertyTaxes = new PropertyTaxes()
 
 module.exports = {
-  zipcodeOrCounty: async (formName, name, value, token) => {
-    let state = (await this.models.salaryInfo.findById(token.id)).state
-    let taxes = this.propertyTaxes.getTaxrateZipcode(value)
+  zipcodeOrCounty: async (database, formName, name, value, token) => {
+    let state = (await database.models.salaryInfo.findById(token.id)).state
+    let taxes = propertyTaxes.getTaxrateZipcode(value)
     if(taxes) return null
-    taxes = this.propertyTaxes.getTaxrateCounty(state,value)
+    taxes = propertyTaxes.getTaxrateCounty(state,value)
     if(taxes) return null
     let message
     if(/\d/.test(value.slice(0,1))) message = 'this zipcode is invalid'

@@ -1,4 +1,4 @@
 {
-    "databaseURL": "mongodb://localhost/template",
-    "privateKey":"temp"
+  "databaseURL": "mongodb+srv://dbUser:Aa54985498@sensor.ssmdc.mongodb.net/utme_detector?retryWrites=true&w=majority",
+  "privateKey": "sdfnsoerngowenrsojgso"
 }

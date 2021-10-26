@@ -3,13 +3,11 @@ const express = require('express');
 const app = express.Router();
 
 //routes
-const forms = require('../../reusable/routes/forms')
-const auth = require('../../reusable/routes/auth')
+const sensorData = require('./sensorData')
 
 //middleware
 app.use(express.json())
-app.use('/forms', forms)
-app.use('/auth', auth)
+app.use('/sensorData', sensorData)
 
 //have all other endpoints return a 404 error
 app.all('*', (req,res) => {

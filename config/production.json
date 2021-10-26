@@ -1,4 +1,4 @@
 {
-    "databaseURL": "mongodb+srv://meanStackTest:Aa54985498!@cluster0.d9acv.mongodb.net/template?retryWrites=true&w=majority",
-    "privateKey": ""
+  "databaseURL": "mongodb+srv://dbUser:Aa54985498@sensor.ssmdc.mongodb.net/sensor-data?retryWrites=true&w=majority",
+  "privateKey": "sdfnsoerngowenrsojgso"
 }

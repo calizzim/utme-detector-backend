@@ -25,6 +25,8 @@ module.exports = class {
 
   async uploadDataset(dataset) {
     const newDataset = new this.sensorDataModel(dataset)
+    const error = newDataset.validateSync()
+    if(error) return { error }
     const result = await newDataset.save()
     return result
   }

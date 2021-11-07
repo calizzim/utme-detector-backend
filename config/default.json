@@ -1,4 +1,4 @@
 {
-  "databaseURL": "mongodb+srv://dbUser:Aa54985498@sensor.ssmdc.mongodb.net/utme_detector?retryWrites=true&w=majority",
+  "databaseURL": "mongodb+srv://dbUser:Aa54985498@sensor.ssmdc.mongodb.net/sensor-data?retryWrites=true&w=majority",
   "privateKey": "sdfnsoerngowenrsojgso"
 }

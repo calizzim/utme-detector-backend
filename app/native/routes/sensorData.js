@@ -7,8 +7,9 @@ const db = new Database()
 app.post('/', async (req, res) => {
   let dataset = req.body
   dataset.start = new Date(dataset.start)
-  db.uploadDataset(dataset)
-  res.status(200).send("hello")
+  let result = await db.uploadDataset(dataset)
+  if(result.error) return res.status(400).send(result)
+  return res.status(200).send({data: result})
 })
 
 app.get('/', async (req, res) => {

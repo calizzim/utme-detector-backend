@@ -3,11 +3,26 @@ const express = require('express')
 const app = express.Router();
 const Database = require('../classes/Database')
 const db = new Database()
+const fs = require('fs')
+
+//dataset structure
+//CO2 array
+//T array
+//RH array
+//TVOC array
+//PM1.0
+//PM2.5
+//PM4.0
+//PM10.0
+//PMSize
+//title
+//start
 
 app.post('/', async (req, res) => {
   let dataset = req.body
   dataset.start = new Date(dataset.start)
   let result = await db.uploadDataset(dataset)
+  console.log(result)
   if(result.error) return res.status(400).send(result)
   return res.status(200).send({data: result})
 })
@@ -24,8 +39,16 @@ app.post('/:setID', async (req, res) => {
 
 app.get('/:setID', async (req, res) => {
   let dataset = await db.getDataset(req.params.setID)
-  dataset.time = new Array(dataset.temperature.length).fill(0).map((c,i) => i * 4) 
   res.status(200).send({data: dataset})
+})
+
+app.get('/download/:setID', async (req,res) => {
+  let dataset = await db.getDataset(req.params.setID)
+  let csvString = ['_id','title','start','time','temperature','humidity','tvoc','pm10','pm25','pm40','pm100','pmSize','co2'].reduce((str,key) => {
+    return `${str}${key},${dataset[key]}\n`
+  },'')
+  fs.writeFileSync('app/native/files/data.csv',csvString)
+  res.status(200).download('app/native/files/data.csv')
 })
 
 

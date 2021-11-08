@@ -7,11 +7,15 @@ module.exports = class {
     let sensorDataSchema = new db.Schema({
       title: String,
       start: Date,
+      co2: [Number],
       temperature: [Number],
       humidity: [Number],
-      voc: [Number],
-      pm: [Number],
-      co2: [Number],
+      tvoc: [Number],
+      pm10: [Number],
+      pm25: [Number],
+      pm40: [Number],
+      pm100: [Number],
+      pmSize: [Number],
     })
 
     this.sensorDataModel = db.model("Sensor Dataset", sensorDataSchema)
@@ -37,8 +41,9 @@ module.exports = class {
   }
 
   async getDataset(id) {
-    const dataset = await this.sensorDataModel.findById(id)
-    return dataset._doc
+    let dataset = (await this.sensorDataModel.findById(id))._doc
+    dataset.time = new Array(dataset.temperature.length).fill(0).map((c,i) => i * 4) 
+    return dataset
   }
 
   async changeName(id, newName) {

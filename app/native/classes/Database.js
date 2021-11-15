@@ -42,12 +42,21 @@ module.exports = class {
 
   async getDataset(id) {
     let dataset = (await this.sensorDataModel.findById(id))._doc
-    dataset.time = new Array(dataset.temperature.length).fill(0).map((c,i) => i * 4) 
+    dataset.time = new Array(dataset.temperature.length).fill(0).map((c,i) => i * 2) 
+    Object.keys(dataset).filter(v => !['_id','title','__v','id','start','time'].includes(v)).forEach(a => {
+      dataset[a].forEach((v,i) => {
+        dataset[a][i] = Number.parseFloat(v).toFixed(2)
+      })
+    })
     return dataset
   }
 
   async changeName(id, newName) {
     await this.sensorDataModel.findByIdAndUpdate(id, { title: newName })
     return this.sensorDataModel.findById(id)
+  }
+
+  async deleteDataset(id) {
+    return await this.sensorDataModel.findByIdAndDelete(id)
   }
 }

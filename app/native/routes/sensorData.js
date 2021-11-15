@@ -39,7 +39,12 @@ app.post('/:setID', async (req, res) => {
 
 app.get('/:setID', async (req, res) => {
   let dataset = await db.getDataset(req.params.setID)
-  res.status(200).send({data: dataset})
+  res.status(200).send({ data: dataset })
+})
+
+app.delete('/:setID', async (req, res) => {
+  await db.deleteDataset(req.params.setID)
+  res.status(200).send({ data: null })
 })
 
 app.get('/download/:setID', async (req,res) => {
